@@ -85,7 +85,8 @@ class GCleaner(object):
 
 
 def main():
-    f_path = raw_input('Where to start scaning? --> ')
+    f_path = raw_input(
+        'Where to start scaning? (current directory by default) --> ')
     gc = GCleaner()
     gc.clean(None if not f_path else f_path)
     print('The script has finished.')

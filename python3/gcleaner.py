@@ -7,6 +7,7 @@ if sys.version_info[0] < 3:
 from os import path, curdir, scandir
 from subprocess import Popen, PIPE, TimeoutExpired
 
+
 class GCleaner(object):
     def __init__(self):
         self.cur_dir = path.abspath(curdir)
@@ -90,7 +91,8 @@ class GCleaner(object):
 
 
 if __name__ == "__main__":
-    f_path = input('Where to start scaning? --> ')
+    f_path = input(
+        'Where to start scaning? (current directory by default) --> ')
     c = GCleaner()
     c.clean(None if not f_path else f_path)
     print('The script has finished.')
