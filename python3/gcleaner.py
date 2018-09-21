@@ -4,7 +4,7 @@ if sys.version_info[0] < 3:
     sys.stderr.write("Python version must be 3.x.x\n")
     sys.exit(-1)
 
-from os import path, curdir, scandir
+from os import path, curdir, walk
 from subprocess import Popen, PIPE, TimeoutExpired
 
 
@@ -16,26 +16,24 @@ class GCleaner(object):
         self.git_push_delete_cmd = 'git push origin --delete'.split()
         self.seconds = 5
 
-    def clean(self, scan_path=None):
-        scan_path = self.cur_dir if not scan_path else scan_path
+    def clean(self, start_path=None):
+        start_path = self.cur_dir if not start_path else start_path
 
-        with scandir(scan_path) as iterator:
-            for entry in iterator:
-                if entry.name == '.git':
-                    self._fetch_with_prune(scan_path)
-                    branches = self._get_remote_branches(scan_path)
+        for root, dirs, _ in walk(start_path):
+            for name in dirs:
+                if name == '.git':
+                    self._fetch_with_prune(root)
+                    branches = self._get_remote_branches(root)
                     if branches:
                         self._push_with_delete(
-                            scan_path, list(filter(None, branches)))
+                            root, list(filter(None, branches)))
                     else:
                         msg = """Failed:
                         Folder: {}
                         Cannot get a list of remote branches
-                        """.format(scan_path)
+                        """.format(root)
                         print(msg)
-
-                elif entry.is_dir():
-                    self.clean(entry.path)
+                    break
 
     def _fetch_with_prune(self, path):
         proc = Popen(self.git_fetch_cmd, cwd=path, stdout=PIPE)
@@ -90,9 +88,13 @@ class GCleaner(object):
                     proc.communicate()
 
 
-if __name__ == "__main__":
+def main():
     f_path = input(
         'Where to start scaning? (current directory by default) --> ')
     c = GCleaner()
     c.clean(None if not f_path else f_path)
     print('The script has finished.')
+
+
+if __name__ == '__main__':
+    main()
