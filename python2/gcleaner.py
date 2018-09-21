@@ -35,6 +35,7 @@ class GCleaner(object):
                         Cannot get a list of remote branches
                         """.format(root)
                         print(msg)
+                    break
 
     def _fetch_with_prune(self, path):
         fetch = Popen(self.git_fetch_cmd, cwd=path, stdout=PIPE, stderr=PIPE)
